@@ -1,0 +1,291 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class StudentManagementSystemMain {
+
+    public static void main(String[] args) {
+        StudentManager sm = new StudentManager();
+        CourseManager cm = new CourseManager();
+        EnrollmentManager em = new EnrollmentManager(cm);
+        ReportGenerator rg = new ReportGenerator();
+
+        seedData(sm, cm, em);
+
+        Scanner sc = new Scanner(System.in);
+        boolean running = true;
+
+        while (running) {
+            printMenu();
+            String choice = sc.nextLine().trim();
+
+            try {
+                switch (choice) {
+                    case "1":
+                        addStudentFlow(sc, sm);
+                        break;
+                    case "2":
+                        removeStudentFlow(sc, sm);
+                        break;
+                    case "3":
+                        findStudentFlow(sc, sm);
+                        break;
+                    case "4":
+                        sm.printAllStudents();
+                        break;
+                    case "5":
+                        addCourseFlow(sc, cm);
+                        break;
+                    case "6":
+                        enrollFlow(sc, sm, cm, em);
+                        break;
+                    case "7":
+                        assignGradeFlow(sc, em);
+                        break;
+                    case "8":
+                        calcGpaFlow(sc, em);
+                        break;
+                    case "9":
+                        reportsFlow(sc, sm, cm, em, rg);
+                        break;
+                    case "10":
+                        demosFlow();
+                        break;
+                    case "0":
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid choice.");
+                }
+            } catch (Exception ex) {
+                System.out.println("ERROR: " + ex.getMessage());
+            }
+
+            System.out.println();
+        }
+
+        System.out.println("Exiting...");
+        sc.close();
+    }
+
+    private static void printMenu() {
+        System.out.println("=== Student Management System ===");
+        System.out.println("1. Add Student");
+        System.out.println("2. Remove Student");
+        System.out.println("3. Find Student");
+        System.out.println("4. List All Students");
+        System.out.println("5. Add Course");
+        System.out.println("6. Enroll Student in Course");
+        System.out.println("7. Assign Grade");
+        System.out.println("8. Calculate Student GPA");
+        System.out.println("9. Generate Reports");
+        System.out.println("10. Run Demos (ArrayList + Generics)");
+        System.out.println("0. Exit");
+        System.out.print("Choice: ");
+    }
+
+    private static void seedData(StudentManager sm, CourseManager cm, EnrollmentManager em) {
+        // Students (10)
+        sm.addStudent(new Student("S001", "Alice", "Smith", "alice@university.edu", 3.8, "Computer Science", 2));
+        sm.addStudent(new Student("S002", "Bob", "Jones", "bob@university.edu", 3.5, "Mathematics", 3));
+        sm.addStudent(new Student("S003", "Charlie", "Brown", "charlie@university.edu", 3.9, "Computer Science", 2));
+        sm.addStudent(new Student("S004", "Diana", "Lopez", "diana@university.edu", 3.2, "Biology", 1));
+        sm.addStudent(new Student("S005", "Ethan", "Wong", "ethan@university.edu", 2.9, "Mathematics", 4));
+        sm.addStudent(new Student("S006", "Fatima", "Ali", "fatima@university.edu", 3.6, "Computer Science", 3));
+        sm.addStudent(new Student("S007", "George", "King", "george@university.edu", 3.1, "History", 2));
+        sm.addStudent(new Student("S008", "Hana", "Kim", "hana@university.edu", 3.7, "Computer Science", 4));
+        sm.addStudent(new Student("S009", "Isaac", "Nolan", "isaac@university.edu", 2.5, "Biology", 1));
+        sm.addStudent(new Student("S010", "Jade", "Patel", "jade@university.edu", 3.4, "History", 3));
+
+        // Courses (5)
+        Course ds = new Course("CISC3130", "Data Structures", 3, "Dr. Smith", 30);
+        ds.addPrerequisite("CISC1115");
+
+        Course intro = new Course("CISC1115", "Intro Programming", 3, "Dr. Smith", 30);
+        Course calc = new Course("MATH101", "Calculus I", 4, "Dr. Johnson", 25);
+        Course bio = new Course("BIO110", "General Biology", 4, "Dr. Stone", 40);
+        Course hist = new Course("HIST200", "World History", 3, "Dr. Rivera", 35);
+
+        cm.addCourse(intro);
+        cm.addCourse(ds);
+        cm.addCourse(calc);
+        cm.addCourse(bio);
+        cm.addCourse(hist);
+
+        // Enrollments + some grades
+        em.enrollStudent("S001", "CISC1115", "Spring 2024"); // E001
+        em.enrollStudent("S003", "CISC1115", "Spring 2024"); // E002
+        em.enrollStudent("S006", "CISC1115", "Spring 2024"); // E003
+        em.assignGrade("E001", "A");
+        em.assignGrade("E002", "B");
+        em.assignGrade("E003", "A");
+
+        em.enrollStudent("S001", "CISC3130", "Fall 2024");   // E004 prereq met
+        em.enrollStudent("S003", "CISC3130", "Fall 2024");   // E005 prereq met
+
+        em.enrollStudent("S002", "MATH101", "Fall 2024");    // E006
+        em.assignGrade("E006", "A");
+
+        em.enrollStudent("S004", "BIO110", "Fall 2024");     // E007
+        em.enrollStudent("S007", "HIST200", "Fall 2024");    // E008
+    }
+
+    private static void addStudentFlow(Scanner sc, StudentManager sm) {
+        System.out.print("Student ID (e.g., S011): ");
+        String id = sc.nextLine().trim();
+        System.out.print("First name: ");
+        String fn = sc.nextLine().trim();
+        System.out.print("Last name: ");
+        String ln = sc.nextLine().trim();
+        System.out.print("Email: ");
+        String email = sc.nextLine().trim();
+        System.out.print("GPA (0.0-4.0): ");
+        double gpa = Double.parseDouble(sc.nextLine().trim());
+        System.out.print("Major: ");
+        String major = sc.nextLine().trim();
+        System.out.print("Year (1-4): ");
+        int year = Integer.parseInt(sc.nextLine().trim());
+
+        sm.addStudent(new Student(id, fn, ln, email, gpa, major, year));
+        System.out.println("Student added.");
+    }
+
+    private static void removeStudentFlow(Scanner sc, StudentManager sm) {
+        System.out.print("Student ID to remove: ");
+        String id = sc.nextLine().trim();
+        boolean removed = sm.removeStudent(id);
+        System.out.println(removed ? "Removed." : "Not found.");
+    }
+
+    private static void findStudentFlow(Scanner sc, StudentManager sm) {
+        System.out.print("Student ID to find: ");
+        String id = sc.nextLine().trim();
+        Student s = sm.findStudent(id);
+        System.out.println(s == null ? "Not found." : s.toString());
+    }
+
+    private static void addCourseFlow(Scanner sc, CourseManager cm) {
+        System.out.print("Course code (e.g., CISC9999): ");
+        String code = sc.nextLine().trim();
+        System.out.print("Course name: ");
+        String name = sc.nextLine().trim();
+        System.out.print("Credits: ");
+        int credits = Integer.parseInt(sc.nextLine().trim());
+        System.out.print("Instructor: ");
+        String instructor = sc.nextLine().trim();
+        System.out.print("Max enrollment: ");
+        int max = Integer.parseInt(sc.nextLine().trim());
+
+        Course c = new Course(code, name, credits, instructor, max);
+
+        System.out.print("Add prerequisites? (y/n): ");
+        String yn = sc.nextLine().trim();
+        while (yn.equalsIgnoreCase("y")) {
+            System.out.print("Prereq course code: ");
+            c.addPrerequisite(sc.nextLine().trim());
+            System.out.print("Add another prerequisite? (y/n): ");
+            yn = sc.nextLine().trim();
+        }
+
+        cm.addCourse(c);
+        System.out.println("Course added.");
+    }
+
+    private static void enrollFlow(Scanner sc, StudentManager sm, CourseManager cm, EnrollmentManager em) {
+        System.out.print("Student ID: ");
+        String sid = sc.nextLine().trim();
+        if (sm.findStudent(sid) == null) throw new IllegalArgumentException("Student not found: " + sid);
+
+        System.out.print("Course code: ");
+        String code = sc.nextLine().trim();
+        if (cm.findCourse(code) == null) throw new IllegalArgumentException("Course not found: " + code);
+
+        // show available courses (prereqs)
+        ArrayList<Course> available = cm.getAvailableCourses(sid, sm, em);
+        boolean ok = false;
+        for (Course c : available) {
+            if (c.getCourseCode().equals(code)) { ok = true; break; }
+        }
+        if (!ok) throw new IllegalStateException("Course not available (already enrolled or prereqs not met).");
+
+        System.out.print("Semester (e.g., Fall 2024): ");
+        String sem = sc.nextLine().trim();
+
+        em.enrollStudent(sid, code, sem);
+        System.out.println("Enrolled successfully.");
+    }
+
+    private static void assignGradeFlow(Scanner sc, EnrollmentManager em) {
+        em.printAllEnrollments();
+        System.out.print("Enrollment ID (e.g., E001): ");
+        String eid = sc.nextLine().trim();
+        System.out.print("Grade (A/B/C/D/F): ");
+        String grade = sc.nextLine().trim();
+        em.assignGrade(eid, grade);
+        System.out.println("Grade assigned.");
+    }
+
+    private static void calcGpaFlow(Scanner sc, EnrollmentManager em) {
+        System.out.print("Student ID: ");
+        String sid = sc.nextLine().trim();
+        double gpa = em.calculateStudentGpa(sid);
+        System.out.printf("Calculated GPA: %.2f%n", gpa);
+    }
+
+    private static void reportsFlow(Scanner sc, StudentManager sm, CourseManager cm, EnrollmentManager em, ReportGenerator rg) {
+        System.out.println("1) Student Report");
+        System.out.println("2) Course Report");
+        System.out.println("3) Major Report");
+        System.out.println("4) Honor Roll Report");
+        System.out.print("Choice: ");
+        String ch = sc.nextLine().trim();
+
+        switch (ch) {
+            case "1":
+                System.out.print("Student ID: ");
+                rg.generateStudentReport(sc.nextLine().trim(), sm, em, cm);
+                break;
+            case "2":
+                System.out.print("Course Code: ");
+                rg.generateCourseReport(sc.nextLine().trim(), cm, em);
+                break;
+            case "3":
+                System.out.print("Major: ");
+                rg.generateMajorReport(sc.nextLine().trim(), sm);
+                break;
+            case "4":
+                System.out.print("Min GPA: ");
+                rg.generateHonorRollReport(sm, Double.parseDouble(sc.nextLine().trim()));
+                break;
+            default:
+                System.out.println("Invalid report choice.");
+        }
+    }
+
+    private static void demosFlow() {
+        System.out.println("\n--- ArrayList Operations Demo ---");
+        ArrayListOperationsDemo.run();
+
+        System.out.println("\n--- ArrayList vs Array Demo ---");
+        ArrayListVsArrayDemo.run();
+
+        System.out.println("\n--- Generics Demo ---");
+        GenericStack<String> stack = new GenericStack<>();
+        stack.push("First");
+        stack.push("Second");
+        System.out.println("Stack pop(): " + stack.pop());
+
+        GenericQueue<Integer> queue = new GenericQueue<>();
+        queue.enqueue(10);
+        queue.enqueue(20);
+        System.out.println("Queue dequeue(): " + queue.dequeue());
+
+        ArrayList<Integer> ints = new ArrayList<>();
+        ints.add(10); ints.add(20); ints.add(30);
+        System.out.println("Sum: " + ArrayListUtils.sum(ints));
+        System.out.println("Average: " + ArrayListUtils.average(ints));
+
+        ArrayList<Object> objects = new ArrayList<>();
+        ArrayListUtils.addNumbers(objects);
+        System.out.println("After addNumbers(? super Integer): " + objects);
+    }
+}
