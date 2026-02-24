@@ -1,0 +1,80 @@
+public class Enrollment {
+    private String enrollmentId;
+    private String studentId;
+    private String courseCode;
+    private String grade;    // A, B, C, D, F, or null
+    private String semester; // e.g., "Fall 2024"
+
+    public Enrollment(String enrollmentId, String studentId, String courseCode, String semester) {
+        setEnrollmentId(enrollmentId);
+        setStudentId(studentId);
+        setCourseCode(courseCode);
+        setSemester(semester);
+        this.grade = null;
+    }
+
+    public String getEnrollmentId() { return enrollmentId; }
+    public void setEnrollmentId(String enrollmentId) {
+        if (enrollmentId == null || enrollmentId.trim().isEmpty())
+            throw new IllegalArgumentException("enrollmentId cannot be null/empty");
+        this.enrollmentId = enrollmentId.trim();
+    }
+
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) {
+        if (studentId == null || studentId.trim().isEmpty())
+            throw new IllegalArgumentException("studentId cannot be null/empty");
+        this.studentId = studentId.trim();
+    }
+
+    public String getCourseCode() { return courseCode; }
+    public void setCourseCode(String courseCode) {
+        if (courseCode == null || courseCode.trim().isEmpty())
+            throw new IllegalArgumentException("courseCode cannot be null/empty");
+        this.courseCode = courseCode.trim();
+    }
+
+    public String getGrade() { return grade; }
+    public void setGrade(String grade) {
+        if (grade == null) { this.grade = null; return; }
+        String g = grade.trim().toUpperCase();
+        if (!isValidGrade(g)) throw new IllegalArgumentException("Invalid grade: " + grade);
+        this.grade = g;
+    }
+
+    public String getSemester() { return semester; }
+    public void setSemester(String semester) {
+        if (semester == null || semester.trim().isEmpty())
+            throw new IllegalArgumentException("semester cannot be null/empty");
+        this.semester = semester.trim();
+    }
+
+    public double getGradePoints() {
+        if (grade == null) return 0.0;
+        switch (grade) {
+            case "A": return 4.0;
+            case "B": return 3.0;
+            case "C": return 2.0;
+            case "D": return 1.0;
+            case "F": return 0.0;
+            default: return 0.0;
+        }
+    }
+
+    public boolean isPassing() {
+        if (grade == null) return false;
+        return grade.equals("A") || grade.equals("B") || grade.equals("C") || grade.equals("D");
+    }
+
+    public static boolean isValidGrade(String grade) {
+        if (grade == null) return false;
+        String g = grade.trim().toUpperCase();
+        return g.equals("A") || g.equals("B") || g.equals("C") || g.equals("D") || g.equals("F");
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Enrollment{id=%s, student=%s, course=%s, semester=%s, grade=%s}",
+                enrollmentId, studentId, courseCode, semester, grade);
+    }
+}
