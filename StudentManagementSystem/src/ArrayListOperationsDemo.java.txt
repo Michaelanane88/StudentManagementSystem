@@ -1,0 +1,125 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+
+public class ArrayListOperationsDemo {
+
+    public static void run() {
+        convertArrayToArrayList();
+        arrayListToArray();
+        subListOperations();
+        sortingDemo();
+        searchingDemo();
+    }
+
+    private static void convertArrayToArrayList() {
+        System.out.println("\n[1] Convert Array -> ArrayList");
+
+        Student[] arr = {
+                new Student("S100", "A", "One", "a@u.edu", 3.0, "CS", 2),
+                new Student("S101", "B", "Two", "b@u.edu", 3.5, "Math", 3)
+        };
+
+        // Arrays.asList returns fixed-size list view (cannot add/remove)
+        ArrayList<Student> list = new ArrayList<>(Arrays.asList(arr));
+        System.out.println("Initial list: " + list);
+
+        list.add(new Student("S102", "C", "Three", "c@u.edu", 3.8, "CS", 1));
+        System.out.println("After add: " + list);
+
+        list.remove(0);
+        System.out.println("After remove index 0: " + list);
+    }
+
+    private static void arrayListToArray() {
+        System.out.println("\n[2] Convert ArrayList -> Array");
+
+        ArrayList<Student> students = new ArrayList<>();
+        students.add(new Student("S200", "D", "Four", "d@u.edu", 2.9, "Bio", 1));
+        students.add(new Student("S201", "E", "Five", "e@u.edu", 3.2, "CS", 4));
+
+        Student[] array = students.toArray(new Student[0]);
+
+        System.out.println("ArrayList:");
+        for (Student s : students) System.out.println(" - " + s);
+
+        System.out.println("Array:");
+        for (Student s : array) System.out.println(" - " + s);
+    }
+
+    private static void subListOperations() {
+        System.out.println("\n[3] subList() operations");
+
+        ArrayList<Student> students = new ArrayList<>();
+        students.add(new Student("S300", "F", "Six", "f@u.edu", 3.0, "CS", 2));
+        students.add(new Student("S301", "G", "Seven", "g@u.edu", 3.1, "CS", 2));
+        students.add(new Student("S302", "H", "Eight", "h@u.edu", 3.2, "CS", 2));
+        students.add(new Student("S303", "I", "Nine", "i@u.edu", 3.3, "CS", 2));
+
+        System.out.println("Original: " + students);
+
+        // subList is a view
+        java.util.List<Student> sub = students.subList(1, 3); // elements 1 and 2
+        System.out.println("SubList (1..3): " + sub);
+
+        sub.remove(0); // removes from original too
+        System.out.println("After sub.remove(0)");
+        System.out.println("SubList: " + sub);
+        System.out.println("Original: " + students);
+    }
+
+    private static void sortingDemo() {
+        System.out.println("\n[4] Sorting (GPA desc, last name asc)");
+
+        ArrayList<Student> students = new ArrayList<>();
+        students.add(new Student("S400", "John", "Zulu", "j@u.edu", 3.2, "CS", 3));
+        students.add(new Student("S401", "Anna", "Alpha", "a@u.edu", 3.9, "CS", 2));
+        students.add(new Student("S402", "Mike", "Bravo", "m@u.edu", 3.5, "CS", 4));
+
+        // GPA descending
+        Collections.sort(students, new Comparator<Student>() {
+            @Override
+            public int compare(Student s1, Student s2) {
+                return Double.compare(s2.getGpa(), s1.getGpa());
+            }
+        });
+        System.out.println("Sorted by GPA desc: " + students);
+
+        // Last name alphabetical
+        Collections.sort(students, new Comparator<Student>() {
+            @Override
+            public int compare(Student s1, Student s2) {
+                return s1.getLastName().compareToIgnoreCase(s2.getLastName());
+            }
+        });
+        System.out.println("Sorted by last name asc: " + students);
+    }
+
+    private static void searchingDemo() {
+        System.out.println("\n[5] Searching (indexOf, contains, binarySearch)");
+
+        ArrayList<Student> students = new ArrayList<>();
+        students.add(new Student("S500", "Amy", "Smith", "amy@u.edu", 3.0, "CS", 2));
+        students.add(new Student("S501", "Ben", "Jones", "ben@u.edu", 3.5, "Math", 3));
+        students.add(new Student("S502", "Cara", "Brown", "cara@u.edu", 3.8, "CS", 1));
+
+        Student target = new Student("S501", "Ben", "Jones", "ben@u.edu", 3.5, "Math", 3);
+
+        System.out.println("indexOf target: " + students.indexOf(target));
+        System.out.println("contains target: " + students.contains(target));
+
+        // For binarySearch, must sort with same comparator
+        Comparator<Student> byId = new Comparator<Student>() {
+            @Override
+            public int compare(Student a, Student b) {
+                return a.getStudentId().compareTo(b.getStudentId());
+            }
+        };
+
+        Collections.sort(students, byId);
+        int idx = Collections.binarySearch(students, target, byId);
+        System.out.println("After sorting by ID: " + students);
+        System.out.println("binarySearch index: " + idx);
+    }
+}
