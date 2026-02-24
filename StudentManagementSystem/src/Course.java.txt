@@ -1,0 +1,71 @@
+import java.util.ArrayList;
+
+public class Course {
+    private String courseCode;
+    private String courseName;
+    private int credits;
+    private String instructor;
+    private int maxEnrollment;
+    private ArrayList<String> prerequisites;
+
+    public Course(String courseCode, String courseName, int credits, String instructor, int maxEnrollment) {
+        setCourseCode(courseCode);
+        setCourseName(courseName);
+        setCredits(credits);
+        setInstructor(instructor);
+        setMaxEnrollment(maxEnrollment);
+        this.prerequisites = new ArrayList<>();
+    }
+
+    public String getCourseCode() { return courseCode; }
+    public void setCourseCode(String courseCode) {
+        if (courseCode == null || courseCode.trim().isEmpty())
+            throw new IllegalArgumentException("courseCode cannot be null/empty");
+        this.courseCode = courseCode.trim();
+    }
+
+    public String getCourseName() { return courseName; }
+    public void setCourseName(String courseName) {
+        if (courseName == null) courseName = "";
+        this.courseName = courseName.trim();
+    }
+
+    public int getCredits() { return credits; }
+    public void setCredits(int credits) {
+        if (credits <= 0) throw new IllegalArgumentException("credits must be > 0");
+        this.credits = credits;
+    }
+
+    public String getInstructor() { return instructor; }
+    public void setInstructor(String instructor) {
+        if (instructor == null) instructor = "";
+        this.instructor = instructor.trim();
+    }
+
+    public int getMaxEnrollment() { return maxEnrollment; }
+    public void setMaxEnrollment(int maxEnrollment) {
+        if (maxEnrollment <= 0) throw new IllegalArgumentException("maxEnrollment must be > 0");
+        this.maxEnrollment = maxEnrollment;
+    }
+
+    public void addPrerequisite(String courseCode) {
+        if (courseCode == null || courseCode.trim().isEmpty()) return;
+        String code = courseCode.trim();
+        if (!prerequisites.contains(code)) prerequisites.add(code);
+    }
+
+    public boolean hasPrerequisite(String courseCode) {
+        if (courseCode == null) return false;
+        return prerequisites.contains(courseCode.trim());
+    }
+
+    public ArrayList<String> getPrerequisites() {
+        return new ArrayList<>(prerequisites);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Course{code=%s, name=%s, credits=%d, instructor=%s, max=%d, prereqs=%s}",
+                courseCode, courseName, credits, instructor, maxEnrollment, prerequisites);
+    }
+}
