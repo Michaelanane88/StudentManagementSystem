@@ -1,0 +1,95 @@
+import java.util.ArrayList;
+import java.util.Random;
+
+public class ArrayListVsArrayDemo {
+
+    public static void run() {
+        demonstrateLimitations();
+        performanceTest();
+    }
+
+    private static void demonstrateLimitations() {
+        System.out.println("\n[1] Array vs ArrayList limitations");
+
+        Student[] arr = new Student[3];
+        arr[0] = new Student("A001", "A", "One", "a@u.edu", 3.0, "CS", 1);
+        arr[1] = new Student("A002", "B", "Two", "b@u.edu", 3.1, "CS", 1);
+        arr[2] = new Student("A003", "C", "Three", "c@u.edu", 3.2, "CS", 1);
+
+        System.out.println("Array size fixed: " + arr.length);
+        System.out.println("Cannot 'add' without creating a new bigger array.");
+
+        ArrayList<Student> list = new ArrayList<>();
+        list.add(arr[0]);
+        list.add(arr[1]);
+        list.add(arr[2]);
+
+        System.out.println("ArrayList size before add: " + list.size());
+        list.add(new Student("A004", "D", "Four", "d@u.edu", 3.3, "CS", 1));
+        System.out.println("ArrayList size after add: " + list.size());
+
+        list.remove(0);
+        System.out.println("ArrayList size after remove: " + list.size());
+    }
+
+    private static void performanceTest() {
+        System.out.println("\n[2] Performance test (10,000 add, 1,000 random access)");
+
+        final int N = 10000;
+        final int ACCESS = 1000;
+
+        // ArrayList add
+        long start = System.nanoTime();
+        ArrayList<Student> list = new ArrayList<>();
+        for (int i = 0; i < N; i++) {
+            list.add(new Student("S" + i, "F", "L", "x@u.edu", 3.0, "CS", 2));
+        }
+        long end = System.nanoTime();
+        long listAddTime = end - start;
+
+        // Array add (requires pre-sizing)
+        start = System.nanoTime();
+        Student[] arr = new Student[N];
+        for (int i = 0; i < N; i++) {
+            arr[i] = new Student("S" + i, "F", "L", "x@u.edu", 3.0, "CS", 2);
+        }
+        end = System.nanoTime();
+        long arrAddTime = end - start;
+
+        // Random access
+        Random rng = new Random(42);
+
+        start = System.nanoTime();
+        for (int i = 0; i < ACCESS; i++) {
+            int idx = rng.nextInt(N);
+            Student s = list.get(idx);
+            if (s == null) System.out.print(""); // prevent optimization
+        }
+        end = System.nanoTime();
+        long listAccessTime = end - start;
+
+        rng = new Random(42);
+        start = System.nanoTime();
+        for (int i = 0; i < ACCESS; i++) {
+            int idx = rng.nextInt(N);
+            Student s = arr[idx];
+            if (s == null) System.out.print("");
+        }
+        end = System.nanoTime();
+        long arrAccessTime = end - start;
+
+        System.out.println("\n--- Comparison Report ---");
+        System.out.println("Add 10,000 students:");
+        System.out.println("ArrayList add time (ns): " + listAddTime);
+        System.out.println("Array add time (ns):     " + arrAddTime);
+
+        System.out.println("\nAccess 1,000 random students:");
+        System.out.println("ArrayList access time (ns): " + listAccessTime);
+        System.out.println("Array access time (ns):     " + arrAccessTime);
+
+        System.out.println("\nSummary:");
+        System.out.println("- Arrays are fixed-size; resizing is manual and expensive.");
+        System.out.println("- ArrayLists resize automatically and simplify add/remove operations.");
+        System.out.println("- Both support fast index access; arrays are often slightly faster.");
+    }
+}
