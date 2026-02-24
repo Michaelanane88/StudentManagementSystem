@@ -1,0 +1,104 @@
+import java.util.ArrayList;
+
+public class CourseManager {
+    private ArrayList<Course> courses;
+
+    public CourseManager() {
+        courses = new ArrayList<>();
+    }
+
+    public void addCourse(Course course) {
+        if (course == null) throw new IllegalArgumentException("course cannot be null");
+        if (findCourse(course.getCourseCode()) != null)
+            throw new IllegalArgumentException("Duplicate courseCode: " + course.getCourseCode());
+        courses.add(course);
+    }
+
+    public Course findCourse(String courseCode) {
+        if (courseCode == null) return null;
+        String c = courseCode.trim();
+        for (Course course : courses) {
+            if (course.getCourseCode().equals(c)) return course;
+        }
+        return null;
+    }
+
+    public ArrayList<Course> getCoursesByInstructor(String instructor) {
+        ArrayList<Course> result = new ArrayList<>();
+        if (instructor == null) return result;
+        String ins = instructor.trim();
+        for (Course c : courses) {
+            if (c.getInstructor().equalsIgnoreCase(ins)) result.add(c);
+        }
+        return result;
+    }
+
+    /**
+     * Courses student can take:
+     * - not already enrolled in that course (any semester)
+     * - prerequisites met (passing grade in prereq course)
+     */
+    public ArrayList<Course> getAvailableCourses(String studentId, StudentManager sm, EnrollmentManager em) {
+        ArrayList<Course> result = new ArrayList<>();
+        if (studentId == null || sm == null || em == null) return result;
+
+        Student student = sm.findStudent(studentId);
+        if (student == null) return result;
+
+        ArrayList<Enrollment> studentEnrollments = em.getEnrollmentsByStudent(studentId);
+
+        for (Course c : courses) {
+            // already enrolled in course?
+            boolean already = false;
+            for (Enrollment e : studentEnrollments) {
+                if (e.getCourseCode().equals(c.getCourseCode())) { already = true; break; }
+            }
+            if (already) continue;
+
+            // check prereqs
+            boolean prereqsMet = true;
+            for (String prereq : c.getPrerequisites()) {
+                boolean passed = false;
+                for (Enrollment e : studentEnrollments) {
+                    if (e.getCourseCode().equals(prereq) && e.getGrade() != null && e.isPassing()) {
+                        passed = true;
+                        break;
+                    }
+                }
+                if (!passed) { prereqsMet = false; break; }
+            }
+
+            if (prereqsMet) result.add(c);
+        }
+
+        return result;
+    }
+
+    public void printAllCourses() {
+        if (courses.isEmpty()) {
+            System.out.println("(No courses)");
+            return;
+        }
+
+        System.out.printf("%-10s %-25s %-7s %-18s %-5s %-15s%n",
+                "Code", "Name", "Credits", "Instructor", "Max", "Prereqs");
+        System.out.println("------------------------------------------------------------------------------------");
+        for (Course c : courses) {
+            System.out.printf("%-10s %-25s %-7d %-18s %-5d %-15s%n",
+                    c.getCourseCode(),
+                    c.getCourseName(),
+                    c.getCredits(),
+                    c.getInstructor(),
+                    c.getMaxEnrollment(),
+                    c.getPrerequisites());
+        }
+    }
+
+    public int getTotalCourses() {
+        return courses.size();
+    }
+
+    public ArrayList<Course> getAllCoursesCopy() {
+        return new ArrayList<>(courses);
+    }
+}
