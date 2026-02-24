@@ -1,0 +1,91 @@
+import java.util.ArrayList;
+
+public class ReportGenerator {
+
+    public void generateStudentReport(String studentId, StudentManager sm, EnrollmentManager em, CourseManager cm) {
+        System.out.println("\n=== STUDENT REPORT ===");
+        Student s = sm.findStudent(studentId);
+        if (s == null) {
+            System.out.println("Student not found: " + studentId);
+            return;
+        }
+
+        System.out.println(s);
+        ArrayList<Enrollment> enrolls = em.getEnrollmentsByStudent(studentId);
+        if (enrolls.isEmpty()) {
+            System.out.println("No enrollments.");
+            return;
+        }
+
+        System.out.println("Enrollments:");
+        for (Enrollment e : enrolls) {
+            Course c = cm.findCourse(e.getCourseCode());
+            String cname = (c == null) ? "(unknown)" : c.getCourseName();
+            System.out.printf("- %s (%s) | %s | Grade: %s%n",
+                    e.getCourseCode(), cname, e.getSemester(), (e.getGrade() == null ? "-" : e.getGrade()));
+        }
+
+        double gpa = em.calculateStudentGpa(studentId);
+        System.out.printf("Calculated GPA from enrollments: %.2f%n", gpa);
+    }
+
+    public void generateCourseReport(String courseCode, CourseManager cm, EnrollmentManager em) {
+        System.out.println("\n=== COURSE REPORT ===");
+        Course c = cm.findCourse(courseCode);
+        if (c == null) {
+            System.out.println("Course not found: " + courseCode);
+            return;
+        }
+        System.out.println(c);
+
+        ArrayList<Enrollment> enrolls = em.getEnrollmentsByCourse(courseCode);
+        System.out.println("Enrollment count: " + enrolls.size());
+
+        if (enrolls.isEmpty()) return;
+
+        double pointsSum = 0.0;
+        int graded = 0;
+        System.out.println("Students:");
+        for (Enrollment e : enrolls) {
+            System.out.printf("- %s | %s | Grade: %s%n",
+                    e.getStudentId(), e.getSemester(), (e.getGrade() == null ? "-" : e.getGrade()));
+            if (e.getGrade() != null) {
+                pointsSum += e.getGradePoints();
+                graded++;
+            }
+        }
+
+        if (graded > 0) {
+            System.out.printf("Average grade points (graded only): %.2f%n", pointsSum / graded);
+        } else {
+            System.out.println("No grades assigned yet.");
+        }
+    }
+
+    public void generateMajorReport(String major, StudentManager sm) {
+        System.out.println("\n=== MAJOR REPORT ===");
+        System.out.println("Major: " + major);
+
+        ArrayList<Student> list = sm.getStudentsByMajor(major);
+        if (list.isEmpty()) {
+            System.out.println("No students in this major.");
+            return;
+        }
+
+        for (Student s : list) System.out.println("- " + s);
+        System.out.printf("Average GPA in major: %.2f%n", sm.getAverageGpaByMajor(major));
+    }
+
+    public void generateHonorRollReport(StudentManager sm, double minGpa) {
+        System.out.println("\n=== HONOR ROLL REPORT ===");
+        System.out.println("Minimum GPA: " + minGpa);
+
+        ArrayList<Student> honors = sm.getHonorStudents(minGpa);
+        if (honors.isEmpty()) {
+            System.out.println("No honor students.");
+            return;
+        }
+
+        for (Student s : honors) System.out.println("- " + s.getStudentId() + " " + s.getFullName() + " GPA=" + s.getGpa());
+    }
+}
